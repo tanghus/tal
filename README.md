@@ -20,7 +20,7 @@ Read more at the [PHPTAL site](http://phptal.org/introduction.html)
 	git clone git://github.com/pornel/PHPTAL.git
 	 </pre>
 	
-3. From your browser the ownCloud apps page (`/settings/apps.php`) and enable the "TAL Page Templates for ownCloud" app.
+3. From your browser go to the ownCloud apps page (`/settings/apps.php`) and enable the "TAL Page Templates for ownCloud" app.
 
 4. Go to the Personal page (`/settings/personal.php`) and check if the installation has succeeded. You will find a section with a link to the manual.
 
