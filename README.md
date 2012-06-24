@@ -13,7 +13,7 @@ Read more at the [PHPTAL site](http://phptal.org/introduction.html)
 	 git clone git://github.com/tanghus/tal.git
 	 </pre>
 	
-2. Go to the `lib`directory of the newly created `tal` folder and clone the PHPTAL repo:
+2. Go to the `lib`directory of the newly created `tal` folder and clone the [PHPTAL repo](https://github.com/pornel/PHPTAL):
 
 	 <pre>
 	cd tal/lib
