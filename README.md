@@ -9,8 +9,8 @@ Read more at the [PHPTAL site](http://phptal.org/introduction.html)
 
 1. Go to your ownCloud apps dir and clone the repo there:
 	
-	`cd owncloud/apps`
-	`git clone git://github.com/tanghus/tal.git`
+	 cd owncloud/apps
+	 git clone git://github.com/tanghus/tal.git
 	
 2. Go to the `lib`directory of the newly created `tal` folder and clone the PHPTAL repo:
 
