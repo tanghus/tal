@@ -253,9 +253,9 @@ class OC_TALTemplate extends OC_Template {
 	public function fetchHeadVars() {
 		// Read the selected theme from the config file
 		$theme=OC_Config::getValue( "theme" );
-		error_log('THIRDPARTYROOT: '.OC::$THIRDPARTYWEBROOT);
-		error_log('WEBROOT: '.OC::$WEBROOT);
-		error_log('APPSROOTS: '.print_r(OC::$THIRDPARTYROOT, true));
+		//error_log('THIRDPARTYROOT: '.OC::$THIRDPARTYWEBROOT);
+		//error_log('WEBROOT: '.OC::$WEBROOT);
+		//error_log('APPSROOTS: '.print_r(OC::$THIRDPARTYROOT, true));
 
 		// Read the detected formfactor and use the right file name.
 		$fext = $this->getFormFactorExtension();
@@ -288,7 +288,7 @@ class OC_TALTemplate extends OC_Template {
 				// Is it part of an app?
 				$append = false;
 				foreach( OC::$APPSROOTS as $apps_dir) {
-					error_log('app: '.$apps_dir['url'].' '."$script$fext.js");
+					//error_log('app: '.$apps_dir['url'].' '."$script$fext.js");
 					if($this->appendIfExist('jsfiles', $apps_dir['path'], OC::$WEBROOT.$apps_dir['url'], "$script$fext.js")) { $append =true; break; }
 					elseif($this->appendIfExist('jsfiles', $apps_dir['path'], $apps_dir['url'], "$script.js")) { $append =true; break; }
 				}
