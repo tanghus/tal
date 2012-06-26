@@ -52,23 +52,22 @@ class OC_TALTemplate extends OC_Template {
 		$this->i18n = new OC_TALL10N($app);
 		$this->setEngine(new PHPTAL());
 		parent::__construct($app, $name, $renderas);
-		$this->fetchHeadVars();
+		//$this->fetchHeadVars();
 		self::$app = $app;
 		//$this->assign('application', $this->app);
 		$this->assign('i18n', $this->i18n);
 		$this->assign('user', OCP\User::getUser());
 		$this->assign('appinfo', OCP\App::getAppInfo($app));
-		$this->assign('appajaxpath', $_SERVER['DOCUMENT_ROOT'].OCP\Util::linkTo($app, 'ajax'));
-		$this->assign('appjspath', $_SERVER['DOCUMENT_ROOT'].OCP\Util::linkTo($app, 'js'));
-		$this->assign('apptemplatepath', $_SERVER['DOCUMENT_ROOT'].OCP\Util::linkTo($app, 'templates'));
+		$this->assign('appajaxpath', OC::$SERVERROOT.OC_App::getAppPath($app).'/ajax');
+		$this->assign('appjspath', OC::$SERVERROOT.OC_App::getAppPath($app).'/js');
+		$this->assign('apptemplatepath', OC::$SERVERROOT.OC_App::getAppPath($app).'/templates');
 		if($renderas) {
-			$this->assign('maintemplate', $_SERVER['DOCUMENT_ROOT'].OCP\Util::linkTo('tal','templates/layout.'.$renderas.'.pt'));
+			$this->assign('maintemplate', OC_App::getAppPath('tal').'/templates/layout.'.$renderas.'.pt');
 			if($renderas == 'user') {
 				$this->assign('requesttoken', OC_Util::callRegister());
 			}
 		}
-		$this->assign('scripts',$this->scripts);
-		$this->assign('styles', $this->styles);
+		//$this->assign('styles', $this->styles);
 		$this->assign('core_styles', !empty(OC_Util::$core_styles)?'core.css':null);
 		$this->assign('core_scripts', !empty(OC_Util::$core_scripts)?'core.js':null);
 		$request = isset($_REQUEST)?$_REQUEST:array();
@@ -78,12 +77,53 @@ class OC_TALTemplate extends OC_Template {
 		$this->assign('server', $_SERVER);
 		$this->assign('webroot', OC::$WEBROOT);
 		$this->assign('theme', OC_Config::getValue('theme'));
-		
+
 		$apps_paths = array();
 		foreach(OC_App::getEnabledApps() as $app){
 			$apps_paths[$app] = OC_App::getAppWebPath($app);
 		}
 		$this->assign( 'apps_paths', str_replace('\\/', '/',json_encode($apps_paths)),false ); // Ugly unescape slashes waiting for better solution
+
+		// Add the js files
+		$jsfiles = OC_TemplateLayout::findJavascriptFiles(OC_Util::$scripts);
+		
+		foreach($jsfiles as $info) {
+			$root = $info[0];
+			$web = $info[1];
+			$file = $info[2];
+			$this->scripts[] = $web.'/'.$file;
+		}
+		$this->assign('scripts',$this->scripts);
+
+		// Add the css files
+		$cssfiles = OC_TemplateLayout::findStylesheetFiles(OC_Util::$styles);
+
+		foreach($cssfiles as $info) {
+			$root = $info[0];
+			$web = $info[1];
+			$file = $info[2];
+			$paths = explode('/', $file);
+
+			$in_root = false;
+			foreach(OC::$APPSROOTS as $app_root) {
+				if($root == $app_root['path']) {
+					$in_root = true;
+					break;
+				}
+			}
+
+			if($in_root ) {
+				$app = $paths[0];
+				unset($paths[0]);
+				$path = implode('/', $paths);
+				$this->styles[] = OC_Helper::linkTo($app, $path);
+			}
+			else {
+				$this->styles[] = $web.'/'.$file;
+			}
+		}
+		$this->assign('styles', $this->styles);
+		
 	}
 
 	/**
@@ -204,136 +244,6 @@ class OC_TALTemplate extends OC_Template {
 	 */
 	public function addHeader( $tag, $attributes, $text=''){
 		$this->_headers[]=array('tag'=>$tag,'attributes'=>$attributes,'text'=>$text);
-	}
-
-	/**
-	 * @brief append the $file-url if exist at $root
-	 * @param $type of collection to use when appending
-	 * @param $root path to check
-	 * @param $web base for path
-	 * @param $file the filename
-	 */
-	public function appendIfExist($type, $root, $webroot, $file) {
-		if(is_file($root.'/'.$file)) {
-			if($type == 'cssfiles') {
-				$this->styles[] = $webroot.'/'.$file;
-			} elseif($type == 'jsfiles') {
-				$this->scripts[] = $webroot.'/'.$file;
-			}
-			//$files[] = array($root, $webroot, $file);
-			return true;
-		}
-		return false;
-	}
-	/*public function appendIfExist($type, $root, $web, $file) {
-		if (is_file($root.'/'.$file)) {
-			$pathes = explode('/', $file);
-			if($root == OC::$APPSROOT && $pathes[0] == 'apps'){
-				$app = $pathes[1];
-				unset($pathes[0]);
-				unset($pathes[1]);
-				$path = implode('/', $pathes);
-				if($type == 'cssfiles') {
-					$this->styles[] = OC_Helper::linkTo($app, $path);
-				} elseif($type == 'jsfiles') {
-					$this->scripts[] = OC_Helper::linkTo($app, $path);
-				}
-			}else{
-				if($type == 'cssfiles') {
-					$this->styles[] = $web.'/'.$file;
-				} elseif($type == 'jsfiles') {
-					$this->scripts[] = $web.'/'.$file;
-				}
-			}
-			return true;
-		}
-		return false;
-	}*/
-
-	public function fetchHeadVars() {
-		// Read the selected theme from the config file
-		$theme=OC_Config::getValue( "theme" );
-		//error_log('THIRDPARTYROOT: '.OC::$THIRDPARTYWEBROOT);
-		//error_log('WEBROOT: '.OC::$WEBROOT);
-		//error_log('APPSROOTS: '.print_r(OC::$THIRDPARTYROOT, true));
-
-		// Read the detected formfactor and use the right file name.
-		$fext = $this->getFormFactorExtension();
-
-		// Add the core js files or the js files provided by the selected theme
-		foreach(OC_Util::$scripts as $script){
-			// Is it in 3rd party?
-			if($this->appendIfExist('jsfiles', OC::$THIRDPARTYROOT, OC::$THIRDPARTYWEBROOT, $script.'.js')) {
-				// Is it in apps and overwritten by the theme?
-			}elseif($this->appendIfExist('jsfiles', OC::$SERVERROOT, OC::$WEBROOT, "themes/$theme/apps/$script$fext.js" )) {
-			}elseif($this->appendIfExist('jsfiles', OC::$SERVERROOT, OC::$WEBROOT, "themes/$theme/apps/$script.js" )) {
-
-			// Is it in the owncloud root but overwritten by the theme?
-			}elseif($this->appendIfExist('jsfiles', OC::$SERVERROOT, OC::$WEBROOT, "themes/$theme/$script$fext.js" )) {
-			}elseif($this->appendIfExist('jsfiles', OC::$SERVERROOT, OC::$WEBROOT, "themes/$theme/$script.js" )) {
-
-			// Is it in the owncloud root ?
-			}elseif($this->appendIfExist('jsfiles', OC::$SERVERROOT, OC::$WEBROOT, "$script$fext.js" )) {
-			}elseif($this->appendIfExist('jsfiles', OC::$SERVERROOT, OC::$WEBROOT, "$script.js" )) {
-
-			// Is in core but overwritten by a theme?
-			}elseif($this->appendIfExist('jsfiles', OC::$SERVERROOT, OC::$WEBROOT, "themes/$theme/core/$script$fext.js" )) {
-			}elseif($this->appendIfExist('jsfiles', OC::$SERVERROOT, OC::$WEBROOT, "themes/$theme/core/$script.js" )) {
-
-			// Is it in core?
-			}elseif($this->appendIfExist('jsfiles', OC::$SERVERROOT, OC::$WEBROOT, "core/$script$fext.js" )) {
-			}elseif($this->appendIfExist('jsfiles', OC::$SERVERROOT, OC::$WEBROOT, "core/$script.js" )) {
-
-			}else{
-				// Is it part of an app?
-				$append = false;
-				foreach( OC::$APPSROOTS as $apps_dir) {
-					//error_log('app: '.$apps_dir['url'].' '."$script$fext.js");
-					if($this->appendIfExist('jsfiles', $apps_dir['path'], OC::$WEBROOT.$apps_dir['url'], "$script$fext.js")) { $append =true; break; }
-					elseif($this->appendIfExist('jsfiles', $apps_dir['path'], $apps_dir['url'], "$script.js")) { $append =true; break; }
-				}
-				if(! $append) {
-					echo('js file not found: script:'.$script.' formfactor:'.$fext.' webroot:'.OC::$WEBROOT.' serverroot:'.OC::$SERVERROOT);
-					die();
-				}
-			}
-		}
-		// Add the css files
-		foreach(OC_Util::$styles as $style){
-			// is it in 3rdparty?
-			if($this->appendIfExist('cssfiles', OC::$THIRDPARTYROOT, OC::$THIRDPARTYWEBROOT, $style.'.css')) {
-			// or in the owncloud root?
-			}elseif($this->appendIfExist('cssfiles', OC::$SERVERROOT, OC::$WEBROOT, "$style$fext.css" )) {
-			}elseif($this->appendIfExist('cssfiles', OC::$SERVERROOT, OC::$WEBROOT, "$style.css" )) {
-			// or in core ?
-			}elseif($this->appendIfExist('cssfiles', OC::$SERVERROOT, OC::$WEBROOT, "core/$style$fext.css" )) {
-			}elseif($this->appendIfExist('cssfiles', OC::$SERVERROOT, OC::$WEBROOT, "core/$style.css" )) {
-			}else{
-				$append = false;
-				// or in apps?
-				foreach( OC::$APPSROOTS as $apps_dir)
-				{
-					if($this->appendIfExist('cssfiles', $apps_dir['path'], OC::$WEBROOT.$apps_dir['url'], "$style$fext.css")) { $append =true; break; }
-					elseif($this->appendIfExist('cssfiles', $apps_dir['path'], $apps_dir['url'], "$style.css")) { $append =true; break; }
-				}
-				if(! $append) {
-					echo('css file not found: style:'.$script.' formfactor:'.$fext.' webroot:'.OC::$WEBROOT.' serverroot:'.OC::$SERVERROOT);
-					die();
-				}
-			}
-		}
-		// Add the theme css files. you can override the default values here
-		if(!empty($theme)) {
-			foreach(OC_Util::$styles as $style){
-				if($this->appendIfExist('cssfiles', OC::$SERVERROOT, OC::$WEBROOT, "themes/$theme/apps/$style$fext.css" )) {
-				}elseif($this->appendIfExist('cssfiles', OC::$SERVERROOT, OC::$WEBROOT, "themes/$theme/apps/$style.css" )) {
-				}elseif($this->appendIfExist('cssfiles', OC::$SERVERROOT, OC::$WEBROOT, "themes/$theme/$style$fext.css" )) {
-				}elseif($this->appendIfExist('cssfiles', OC::$SERVERROOT, OC::$WEBROOT, "themes/$theme/$style.css" )) {
-				}elseif($this->appendIfExist('cssfiles', OC::$SERVERROOT, OC::$WEBROOT, "themes/$theme/core/$style$fext.css" )) {
-				}elseif($this->appendIfExist('cssfiles', OC::$SERVERROOT, OC::$WEBROOT, "themes/$theme/core/$style.css" )) {
-				}
-			}
-		}
 	}
 
 	/**
