@@ -88,7 +88,7 @@ class OC_TALL10N extends OC_L10N implements PHPTAL_TranslationService {
 		}
 
 		if ($escape) {
-			$v = htmlspecialchars($v);
+			$v = htmlspecialchars($v, ENT_QUOTES, 'UTF-8');
 		}
 
 		//while (preg_match('/\{(.*?)\}/sm', $v, $m)) {
