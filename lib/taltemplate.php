@@ -9,13 +9,13 @@
 
 function phptal_tales_remote($exp, $nothrow) {
 	//$exp = trim($exp, ' \t\r\n/');
-	error_log(phptal_tales($exp, $nothrow));
+	//error_log(phptal_tales($exp, $nothrow));
 	return "OCP\Util::linkToRemote(".phptal_tales($exp, $nothrow).")";
 }
 
 function phptal_tales_url($src, $nothrow) {
 	//$exp = trim($exp, ' \t\r\n/');
-	error_log(phptal_tales($src, $nothrow));
+	//error_log(phptal_tales($src, $nothrow));
 	return "OC_TALTemplate::linkToAbsolute(".phptal_tales($src, $nothrow).")";
 }
 
@@ -58,9 +58,9 @@ class OC_TALTemplate extends OC_Template {
 		$this->assign('i18n', $this->i18n);
 		$this->assign('user', OCP\User::getUser());
 		$this->assign('appinfo', OCP\App::getAppInfo($app));
-		$this->assign('appajaxpath', OC::$SERVERROOT.OC_App::getAppPath($app).'/ajax');
-		$this->assign('appjspath', OC::$SERVERROOT.OC_App::getAppPath($app).'/js');
-		$this->assign('apptemplatepath', OC::$SERVERROOT.OC_App::getAppPath($app).'/templates');
+		$this->assign('appajaxpath', OC_App::getAppPath($app).'/ajax');
+		$this->assign('appjspath', OC_App::getAppPath($app).'/js');
+		$this->assign('apptemplatepath', OC_App::getAppPath($app).'/templates');
 		if($renderas) {
 			$this->assign('maintemplate', OC_App::getAppPath('tal').'/templates/layout.'.$renderas.'.pt');
 			if($renderas == 'user') {
@@ -264,7 +264,7 @@ class OC_TALTemplate extends OC_Template {
 	 * will produce a full page.
 	 */
 	public function fetchPage(){
-		error_log('renderas: '.$this->renderas);
+		//error_log('renderas: '.$this->renderas);
 		if($this->renderas) {
 			// Add custom headers
 			$this->assign('headers',array_merge($this->_headers, OC_Util::$headers));
@@ -337,7 +337,7 @@ class OC_TALTemplate extends OC_Template {
 	}
 
 	static function config($src) {
-		error_log('pref '.$src);
+		//error_log('pref '.$src);
 		$parts = is_array($src)?$src:explode('/', rtrim($src, ' \t\r\n/'));
 		if(count($parts) < 2) {
 			throw new PHPTAL_Exception('Wrong argument count: config: takes no less than 2 arguments.');
