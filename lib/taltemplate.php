@@ -1,6 +1,6 @@
 <?php
 /**
- * kate: replace-tabs off; indent-mode Normal; keep-extra-spaces: off; tab-indents: on; 
+ * kate: replace-tabs off; indent-mode Normal; keep-extra-spaces: off; tab-indents: on;
  * Copyright (c) 2012 Thomas Tanghus <thomas@tanghus.net>
  * This file is licensed under the Affero General Public License version 3 or
  * later.
@@ -85,8 +85,9 @@ class OC_TALTemplate extends OC_Template {
 		$this->assign( 'apps_paths', str_replace('\\/', '/',json_encode($apps_paths)),false ); // Ugly unescape slashes waiting for better solution
 
 		// Add the js files
+		$this->scripts[] = OC_Helper::linkToRemote('core.js', false);
 		$jsfiles = OC_TemplateLayout::findJavascriptFiles(OC_Util::$scripts);
-		
+
 		foreach($jsfiles as $info) {
 			$root = $info[0];
 			$web = $info[1];
@@ -96,6 +97,7 @@ class OC_TALTemplate extends OC_Template {
 		$this->assign('scripts',$this->scripts);
 
 		// Add the css files
+		$this->styles[] = OC_Helper::linkToRemote('core.css', false);
 		$cssfiles = OC_TemplateLayout::findStylesheetFiles(OC_Util::$styles);
 
 		foreach($cssfiles as $info) {
@@ -123,7 +125,7 @@ class OC_TALTemplate extends OC_Template {
 			}
 		}
 		$this->assign('styles', $this->styles);
-		
+
 	}
 
 	/**
@@ -148,7 +150,7 @@ class OC_TALTemplate extends OC_Template {
 	}
 
 	/**
-	 * Forces reparsing of all templates all the time. It should be used only for testing and debugging. 
+	 * Forces reparsing of all templates all the time. It should be used only for testing and debugging.
 	 * It's useful if you're testing pre filters or changing code of PHPTAL itself.
 	 * WARNING: This slows down PHPTAL very much. Never enable this on production servers!
 	 */
@@ -156,7 +158,7 @@ class OC_TALTemplate extends OC_Template {
 		OCP\Util::writeLog('tal','ForceReparse is enabled!', OCP\Util::WARN);
 		$this->_engine->setForceReparse();
 	}
-	
+
 	/**
 	* Get PHPTAL object from View
 	*
@@ -266,6 +268,7 @@ class OC_TALTemplate extends OC_Template {
 	public function fetchPage(){
 		//error_log('renderas: '.$this->renderas);
 		if($this->renderas) {
+			$page = new OC_TemplateLayout($this->renderas);
 			// Add custom headers
 			$this->assign('headers',array_merge($this->_headers, OC_Util::$headers));
 			// Add navigation entry
