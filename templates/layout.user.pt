@@ -15,23 +15,13 @@
 	var oc_webroot = '${webroot}';
 	var oc_appswebroots = ${structure apps_paths};
 	var oc_current_user = '${user}';
+	var oc_requesttoken = '${requesttoken}';
+	var oc_requestlifespan = '${requestlifespan}';
 	</script>
 
 	<tal:block tal:repeat="script scripts">
 	<script type="text/javascript" tal:attributes="src script"></script>
 	</tal:block>
-
-	<script type="text/javascript">
-		$(function() {
-			requesttoken = '${requesttoken}';
-			OC.EventSource.requesttoken=requesttoken;
-			$(document).bind('ajaxSend', function(elm, xhr, s){
-				if(requesttoken) {
-					xhr.setRequestHeader('requesttoken', requesttoken);
-				}
-			});
-		});
-	</script>
 
 	<tal:block tal:repeat="header headers">
 		<tal:block tal:replace='structure string:${header/tag}' /> <tal:block tal:repeat="attribute header/attributes"><tal:block tal:replace='structure string:${repeat/attribute/key}="${attribute}"' /></tal:block> />
