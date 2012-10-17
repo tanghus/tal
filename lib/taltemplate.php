@@ -61,12 +61,10 @@ class OC_TALTemplate extends OC_Template {
 		$this->assign('appajaxpath', OC_App::getAppPath($app).'/ajax');
 		$this->assign('appjspath', OC_App::getAppPath($app).'/js');
 		$this->assign('apptemplatepath', OC_App::getAppPath($app).'/templates');
+		$this->assign('requesttoken', OC_Util::callRegister());
+		$this->assign('requestlifespan', OC_Util::$callLifespan);
 		if($renderas) {
 			$this->assign('maintemplate', OC_App::getAppPath('tal').'/templates/layout.'.$renderas.'.pt');
-			if($renderas == 'user') {
-				$this->assign('requesttoken', OC_Util::callRegister());
-				$this->assign('requestlifespan', OC_Util::$callLifespan);
-			}
 		}
 		//$this->assign('styles', $this->styles);
 		$this->assign('core_styles', !empty(OC_Util::$core_styles)?'core.css':null);
