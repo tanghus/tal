@@ -65,6 +65,9 @@ class OC_TALTemplate extends OC_Template {
 		$this->assign('requestlifespan', OC_Util::$callLifespan);
 		if($renderas) {
 			$this->assign('maintemplate', OC_App::getAppPath('tal').'/templates/layout.'.$renderas.'.pt');
+			$this->assign('dayNames', json_encode(array((string)$this->i18n->t('Sunday'), (string)$this->i18n->t('Monday'), (string)$this->i18n->t('Tuesday'), (string)$this->i18n->t('Wednesday'), (string)$this->i18n->t('Thursday'), (string)$this->i18n->t('Friday'), (string)$this->i18n->t('Saturday'))));
+			$this->assign('monthNames', json_encode(array((string)$this->i18n->t('January'), (string)$this->i18n->t('February'), (string)$this->i18n->t('March'), (string)$this->i18n->t('April'), (string)$this->i18n->t('May'), (string)$this->i18n->t('June'), (string)$this->i18n->t('July'), (string)$this->i18n->t('August'), (string)$this->i18n->t('September'), (string)$this->i18n->t('October'), (string)$this->i18n->t('November'), (string)$this->i18n->t('December'))));
+			$this->assign('firstDay', json_encode($this->i18n->l('firstday')));
 		}
 		//$this->assign('styles', $this->styles);
 		$this->assign('core_styles', !empty(OC_Util::$core_styles)?'core.css':null);

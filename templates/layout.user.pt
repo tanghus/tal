@@ -17,6 +17,12 @@
 	var oc_current_user = '${user}';
 	var oc_requesttoken = '${requesttoken}';
 	var oc_requestlifespan = '${requestlifespan}';
+
+
+	var dayNames = ${structure dayNames};
+	var monthNames = ${structure monthNames};
+	var firstDay = ${structure firstDay};
+
 	</script>
 
 	<tal:block tal:repeat="script scripts">
