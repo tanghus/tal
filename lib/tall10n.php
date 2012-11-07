@@ -55,7 +55,7 @@ class OC_TALL10N extends OC_L10N implements PHPTAL_TranslationService {
 		if(!$domain) {
 			return;
 		}
-		error_log('useDomain: '.$domain);
+		OCP\Util::writeLog('tal', __METHOD__ . ' ' . $domain, OCP\Util::WARN);
 		$this->app = $domain;
 		$this->init();
 	}
@@ -69,7 +69,7 @@ class OC_TALL10N extends OC_L10N implements PHPTAL_TranslationService {
 	* @param string $value
 	*/
     public function setVar($key, $value) {
-		error_log('setVar: '.$key.'=>'.$value);
+		OCP\Util::writeLog('tal', __METHOD__.' ' . $key . '=>' . $value, OCP\Util::WARN);
         $this->vars[$key] = $value;
     }
 
