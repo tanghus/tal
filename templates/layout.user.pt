@@ -16,8 +16,6 @@
 	var oc_appswebroots = ${structure apps_paths};
 	var oc_current_user = '${user}';
 	var oc_requesttoken = '${requesttoken}';
-	var oc_requestlifespan = '${requestlifespan}';
-
 
 	var dayNames = ${structure dayNames};
 	var monthNames = ${structure monthNames};
