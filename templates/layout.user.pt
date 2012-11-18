@@ -26,6 +26,13 @@
 	<tal:block tal:repeat="script scripts">
 	<script type="text/javascript" tal:attributes="src script"></script>
 	</tal:block>
+	<script type="text/javascript">
+		requesttoken = '${requesttoken}';
+		OC.EventSource.requesttoken=requesttoken;
+		$(document).bind('ajaxSend', function(elm, xhr, s) {
+			xhr.setRequestHeader('requesttoken', requesttoken);
+		});
+	</script>
 
 	<tal:block tal:repeat="header headers">
 		<tal:block tal:replace='structure string:${header/tag}' /> <tal:block tal:repeat="attribute header/attributes"><tal:block tal:replace='structure string:${repeat/attribute/key}="${attribute}"' /></tal:block> />
