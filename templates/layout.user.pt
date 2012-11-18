@@ -12,6 +12,7 @@
 	</tal:block>
 
 	<script type="text/javascript">
+	var oc_debug = <span tal:replace="php:(DEBUG ? 'true' : 'false')" />;
 	var oc_webroot = '${webroot}';
 	var oc_appswebroots = ${structure apps_paths};
 	var oc_current_user = '${user}';

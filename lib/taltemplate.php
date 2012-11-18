@@ -77,6 +77,7 @@ class OC_TALTemplate extends OC_Template {
 		$request['get'] = isset($_GET)?$_GET:array();
 		$this->assign('request', $request);
 		$this->assign('server', $_SERVER);
+		$this->assign('DEBUG', (defined('DEBUG') && DEBUG) ? true : false);
 		$this->assign('webroot', OC::$WEBROOT);
 		$this->assign('theme', OC_Config::getValue('theme'));
 
