@@ -43,10 +43,34 @@
 <header>
 	<div id="header" tal:define="index linkto:string:/index.php">
 		<a id="owncloud" tal:attributes="href index"><img class="svg" tal:attributes="src image:string:logo-wide.svg" src="logo-wide.svg" alt="ownCloud" /></a>
-			<a class="header-right header-action" id="logout" tal:attributes="href string:${index}?logout=true"><img class="svg" tal:attributes="src image:string:/actions/logout.svg" i18n:attributes="alt;title" alt="Log out" title="Log out" src="actions/logout.svg" /></a>
-			<form class="searchbox header-right" action="#" method="post">
-				<input id="searchbox" class="svg" type="search" name="query" tal:attributes="value request/post/query|nothing" value="" autocomplete="off" />
-			</form>
+
+		<ul id="settings" class="svg">
+			<span id="expand">
+				<?php echo OCP\User::getDisplayName($user=null)?OCP\User::getDisplayName($user=null):(OC_User::getUser()?OC_User::getUser():'') ?>
+				<img class="svg" src="actions/caret.svg" tal:attributes="src image:string:core/actions/caret.svg"/>
+			</span>
+			<div id="expanddiv"
+				tal:attributes="class structure php:bodyid EQ 'body-user' ? 'hidden' : nothing">
+				<li tal:repeat="entry settingsnavigation">
+					<a tal:attributes="href entry/href;class php:entry['active']?'active':''">
+						<img class="svg" alt="" tal:attributes="src entry/icon" />
+						<span tal:replace="entry/name">Name</span>
+					</a>
+				</li>
+				<li>
+					<a class="header-right header-action" id="logout" tal:attributes="href string:${index}?logout=true">
+						<img class="svg"
+							tal:attributes="src image:string:/actions/logout.svg"
+							i18n:attributes="alt;title" alt="Log out" title="Log out" src="actions/logout.svg" />
+						<span i18n:translate="">Log out</span>
+					</a>
+				</li>
+			</div>
+		</ul>
+
+		<form class="searchbox header-right" action="#" method="post">
+			<input id="searchbox" class="svg" type="search" name="query" tal:attributes="value request/post/query|nothing" value="" autocomplete="off" />
+		</form>
 	</div>
 </header>
 
@@ -54,25 +78,19 @@
 	<div id="navigation">
 	<ul id="apps" class="svg">
 		<li tal:repeat="entry navigation">
-			<a tal:attributes="style structure string:background-image:url(${entry/icon});href entry/href;class php:entry['active']?'active':null" tal:content="entry/name">Name</a>
+			<a tal:attributes="href entry/href;title entry/name;class php:entry['active']?'active':null">
+			<img class="icon" alt="" tal:attributes="src entry/icon" />
+			<span tal:replace="entry/name">Name</span></a>
 		</li>
 	</ul>
 
-	<ul id="settings" class="svg">
-		<img role="button" tabindex="0" id="expand" class="svg"
-			i18n:attributes="alt Settings" alt="Settings" tal:attributes="src image:string:/actions/settings.svg" src="actions/settings.svg" />
-		<span i18n:translate="">Settings</span>
-		<div id="expanddiv"
-			tal:attributes="class structure php:bodyid EQ 'body-user' ? 'hidden' : nothing">
-			<li tal:repeat="entry settingsnavigation">
-<a  tal:attributes="style structure string:background-image:url(${entry/icon});href entry/href;class entry/active|nothing" tal:content="entry/name">Name</a></li>
-		</div>
-	</ul>
 	</div>
 </nav>
 
-<div id="content" metal:define-slot="content">
+<div id="content-wrapper">
+	<div id="content" metal:define-slot="content">
       This is the content.
+	</div>
 </div>
 </body>
 </html>
