@@ -59,9 +59,9 @@ Calendar time zone: $${config:string:user/calendar/timezone}</pre>
 	Calendar time zone: ${config:string:user/calendar/timezone}<br />
 	<h2>Translating content</h2>
 	<strong>Before:</strong>
-	<pre>&lt;p&gt;&lt;?php echo $l-&gt;t('This will be translated.'); ?&gt;&lt;p&gt;</pre>
+	<pre>&lt;p&gt;&lt;?php echo $l-&gt;t('This will be translated.'); ?&gt;&lt;/p&gt;</pre>
 	<strong>After:</strong>
-	<pre>&lt;p i18n:translate=""&gt;This will be translated.&lt;p&gt;</pre>
+	<pre>&lt;p i18n:translate=""&gt;This will be translated.&lt;p/&gt;</pre>
 	<a class="readmore" href="http://phptal.org/manual/en/split/i18n-content.html" target="_blank">Read more...</a>
 	<h2>Translating content with variables</h2>
 	<strong>Before:</strong>
