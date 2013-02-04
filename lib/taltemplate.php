@@ -300,7 +300,7 @@ class OC_TALTemplate extends OC_Template {
 
 	static function linkTo($src) {
 		//error_log('linkTo '.$src);
-		$parts = is_array($src)?$src:explode('/', rtrim($src, ' \t\r\n/'));
+		$parts = is_array($src)?$src:explode('/', rtrim($src));
 		if($parts[0] == '') {
 			array_shift($parts);
 			return OCP\Util::linkTo('', implode('/', $parts));
@@ -316,7 +316,7 @@ class OC_TALTemplate extends OC_Template {
 
 	static function linkToAbsolute($src) {
 		//error_log('linkTo '.$src);
-		$parts = is_array($src)?$src:explode('/', rtrim($src, ' \t\r\n/'));
+		$parts = is_array($src)?$src:explode('/', rtrim($src));
 		if($parts[0] == '') {
 			array_shift($parts);
 			return OCP\Util::linkToAbsolute('', implode('/', $parts));
@@ -332,7 +332,7 @@ class OC_TALTemplate extends OC_Template {
 
 	static function imagePath($src) {
 		//error_log('imagePath '.$src);
-		$parts = is_array($src)?$src:explode('/', rtrim($src, ' \t\r\n/'));
+		$parts = is_array($src)?$src:explode('/', rtrim($src));
 		if($parts[0] == '') {
 			array_shift($parts);
 			return OCP\Util::imagePath('', implode('/', $parts));
@@ -347,8 +347,7 @@ class OC_TALTemplate extends OC_Template {
 	}
 
 	static function config($src) {
-		//error_log('pref '.$src);
-		$parts = is_array($src)?$src:explode('/', rtrim($src, ' \t\r\n/'));
+		$parts = is_array($src)?$src:explode('/', rtrim($src));
 		if(count($parts) < 2) {
 			throw new PHPTAL_Exception('Wrong argument count: config: takes no less than 2 arguments.');
 		} else {
