@@ -16,6 +16,7 @@
 	var oc_appswebroots = ${structure apps_paths};
 	var oc_current_user = '${user}';
 	var oc_requesttoken = '${requesttoken}';
+	var oc_requestlifespan = '${requestlifespan}';
 	</script>
 
 	<tal:block tal:repeat="script scripts">

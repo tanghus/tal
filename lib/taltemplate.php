@@ -65,6 +65,7 @@ class OC_TALTemplate extends OC_Template {
 			$this->assign('maintemplate', OC_App::getAppPath('tal').'/templates/layout.'.$renderas.'.pt');
 			if($renderas == 'user') {
 				$this->assign('requesttoken', OC_Util::callRegister());
+				$this->assign('requestlifespan', OC_Util::$callLifespan);
 			}
 		}
 		//$this->assign('styles', $this->styles);
