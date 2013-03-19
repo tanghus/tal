@@ -1,0 +1,7 @@
+# Changelog
+
+### 0.2
+
+* Use OC_TemplateLayout to render the layout. All apps using TALTemplate
+  will have to update their templates and remove any markup besides what
+  they want rendered.
