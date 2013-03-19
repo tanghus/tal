@@ -4,4 +4,6 @@
 
 * Use OC_TemplateLayout to render the layout. All apps using TALTemplate
   will have to update their templates and remove any markup besides what
-  they want rendered.
+  they want rendered. See the manual for more info.
+
+* The classes now uses the OCA\TAL namespace.
