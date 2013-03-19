@@ -1,0 +1,3 @@
+[submodule "3rdparty/PHPTAL"]
+	path = 3rdparty/PHPTAL
+	url = git://github.com/pornel/PHPTAL.git
