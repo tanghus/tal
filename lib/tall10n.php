@@ -8,8 +8,9 @@
 
 //require_once 'PHPTAL/TranslationService.php';
 
+namespace OCA\TAL;
 
-class OC_TALL10N extends OC_L10N implements PHPTAL_TranslationService {
+class L10N extends \OC_L10N implements \PHPTAL_TranslationService {
 	private $encoding = 'UTF-8';
     private $vars = array();
 	//private $lang = '';
@@ -55,7 +56,7 @@ class OC_TALL10N extends OC_L10N implements PHPTAL_TranslationService {
 		if(!$domain) {
 			return;
 		}
-		OCP\Util::writeLog('tal', __METHOD__ . ' ' . $domain, OCP\Util::WARN);
+		//\OCP\Util::writeLog('tal', __METHOD__ . ' ' . $domain, \OCP\Util::DEBUG);
 		$this->app = $domain;
 		$this->init();
 	}
@@ -69,7 +70,7 @@ class OC_TALL10N extends OC_L10N implements PHPTAL_TranslationService {
 	* @param string $value
 	*/
     public function setVar($key, $value) {
-		OCP\Util::writeLog('tal', __METHOD__.' ' . $key . '=>' . $value, OCP\Util::WARN);
+		//\OCP\Util::writeLog('tal', __METHOD__.' ' . $key . '=>' . $value, \OCP\Util::DEBUG);
         $this->vars[$key] = $value;
     }
 

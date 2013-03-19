@@ -5,14 +5,14 @@
  * later.
  * See the COPYING-README file.
  */
- 
+
 OCP\JSON::checkLoggedIn();
 OCP\JSON::checkAppEnabled('tal');
 
 $id = isset($_GET['id'])?trim(strip_tags($_GET['id'])):'';
 
 if($id) {
-	$tmpl = new OC_TALTemplate('tal', 'sections');
+	$tmpl = new OCA\TAL\Template('tal', 'sections');
 	$tmpl->assign('id',$id);
 	$page = $tmpl->fetchPage();
 	OCP\JSON::success(array('data' => array('id'=>$id, 'page'=>$page)));

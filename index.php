@@ -22,7 +22,7 @@ $sections = array(
 		);
 $page = isset($_GET['page'])?trim(strip_tags($_GET['page'])):$sections[0]['id'];
 
-$tmpl = new OC_TALTemplate('tal', 'manual', 'user');
+$tmpl = new OCA\TAL\Template('tal', 'manual', 'user');
 $tmpl->assign('application', 'TAL');
 $tmpl->assign('page', $page);
 $tmpl->assign('sections', $sections);
