@@ -13,11 +13,11 @@ Read more at the [PHPTAL site](http://phptal.org/introduction.html)
 	 git clone git://github.com/tanghus/tal.git
 	 </pre>
 	
-2. Go to the `lib`directory of the newly created `tal` folder and clone the [PHPTAL repo](https://github.com/pornel/PHPTAL):
+2. go to the newly created `tal` folder and update the [PHPTAL](https://github.com/pornel/PHPTAL) submodule:
 
 	 <pre>
-	cd tal/lib
-	git clone git://github.com/pornel/PHPTAL.git
+	cd tal
+	git submodule update --init
 	 </pre>
 	
 3. From your browser go to the ownCloud apps page (`/settings/apps.php`) and enable the "TAL Page Templates for ownCloud" app.
