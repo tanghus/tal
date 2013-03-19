@@ -127,7 +127,29 @@ $$arr = array('color' => 'red',
 </section>
 <section data-id="gotchas" metal:define-macro="gotchas">
 	<h1>Caveats &amp; Gotchas</h1>
-	I know
+	Since version 0.2 TAL Page Templates uses OC_TemplateLayout to, well, layout the page ;)
+	This means that you will have to strip your templates from any HTML elements sorrounding your content.
+	If your page previously looked like:
+<!DOCTYPE html>
+<pre>
+&lt;html metal:use-macro="$${maintemplate}"&gt;
+	&lt;head&gt;
+		&lt;title&gt;TAL Page Templates&lt;/title&gt;
+	&lt;/head&gt;
+	&lt;body&gt;
+		&lt;div id="content" metal:fill-slot="content"&gt;
+		Your content here...
+		&lt;/div&gt;
+	&lt;/body&gt;
+&lt;/html&gt;
+</pre>
+You will need to strip it down to:
+<pre>
+	Your content here...
+</pre>
+I would have preferred to keep the full templates, but it meant that I had to play catch-up with
+the main ownCloud templates, and it was too error prone in the long run. This way the app requires
+very little maintenance, and I only have to take care of any changes to the ownCloud API.
 </section>
 <section data-id="ref" metal:define-macro="ref">
 	<h1>References</h1>
