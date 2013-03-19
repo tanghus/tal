@@ -130,7 +130,7 @@ $$arr = array('color' => 'red',
 	Since version 0.2 TAL Page Templates uses OC_TemplateLayout to, well, layout the page ;)
 	This means that you will have to strip your templates from any HTML elements sorrounding your content.
 	If your page previously looked like:
-<!DOCTYPE html>
+&lt;!DOCTYPE html&gt;
 <pre>
 &lt;html metal:use-macro="$${maintemplate}"&gt;
 	&lt;head&gt;
