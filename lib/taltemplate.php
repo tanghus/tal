@@ -45,33 +45,24 @@ class OC_TALTemplate extends OC_Template {
 	protected static $app = '';
 
 	public function __construct($app, $name, $renderas = "") {
-		//if(defined('DEBUG') && DEBUG) {
+		if(defined('DEBUG') && DEBUG) {
 			ini_set('display_errors', true);
-		//}
+		}
 		$this->renderas = $renderas;
 		$this->i18n = new OC_TALL10N($app);
 		$this->setEngine(new PHPTAL());
 		parent::__construct($app, $name, $renderas);
-		//$this->fetchHeadVars();
 		self::$app = $app;
-		//$this->assign('application', $this->app);
+		$this->assign('application', self::$app);
 		$this->assign('i18n', $this->i18n);
 		$this->assign('user', OCP\User::getUser());
+		$user_displayname = OC_User::getDisplayName();
+		$this->assign('user_displayname', $user_displayname);
 		$this->assign('appinfo', OCP\App::getAppInfo($app));
 		$this->assign('appajaxpath', OC_App::getAppPath($app).'/ajax');
 		$this->assign('appjspath', OC_App::getAppPath($app).'/js');
 		$this->assign('apptemplatepath', OC_App::getAppPath($app).'/templates');
 		$this->assign('requesttoken', OC_Util::callRegister());
-		//$this->assign('requestlifespan', OC_Util::$callLifespan);
-		if($renderas) {
-			$this->assign('maintemplate', OC_App::getAppPath('tal').'/templates/layout.'.$renderas.'.pt');
-			$this->assign('dayNames', json_encode(array((string)$this->i18n->t('Sunday'), (string)$this->i18n->t('Monday'), (string)$this->i18n->t('Tuesday'), (string)$this->i18n->t('Wednesday'), (string)$this->i18n->t('Thursday'), (string)$this->i18n->t('Friday'), (string)$this->i18n->t('Saturday'))));
-			$this->assign('monthNames', json_encode(array((string)$this->i18n->t('January'), (string)$this->i18n->t('February'), (string)$this->i18n->t('March'), (string)$this->i18n->t('April'), (string)$this->i18n->t('May'), (string)$this->i18n->t('June'), (string)$this->i18n->t('July'), (string)$this->i18n->t('August'), (string)$this->i18n->t('September'), (string)$this->i18n->t('October'), (string)$this->i18n->t('November'), (string)$this->i18n->t('December'))));
-			$this->assign('firstDay', json_encode($this->i18n->l('firstday', 'firstday')));
-		}
-		//$this->assign('styles', $this->styles);
-		$this->assign('core_styles', !empty(OC_Util::$core_styles)?'core.css':null);
-		$this->assign('core_scripts', !empty(OC_Util::$core_scripts)?'core.js':null);
 		$request = isset($_REQUEST)?$_REQUEST:array();
 		$request['post'] = isset($_POST)?$_POST:array();
 		$request['get'] = isset($_GET)?$_GET:array();
@@ -80,55 +71,6 @@ class OC_TALTemplate extends OC_Template {
 		$this->assign('DEBUG', (defined('DEBUG') && DEBUG) ? true : false);
 		$this->assign('webroot', OC::$WEBROOT);
 		$this->assign('theme', OC_Config::getValue('theme'));
-
-		$apps_paths = array();
-		foreach(OC_App::getEnabledApps() as $app){
-			$apps_paths[$app] = OC_App::getAppWebPath($app);
-		}
-		$this->assign( 'apps_paths', str_replace('\\/', '/',json_encode($apps_paths)),false ); // Ugly unescape slashes waiting for better solution
-
-		// Add the js files
-		$this->scripts[] = OC_Helper::linkToRemote('core.js', false);
-		$jsfiles = OC_TemplateLayout::findJavascriptFiles(OC_Util::$scripts);
-
-		foreach($jsfiles as $info) {
-			$root = $info[0];
-			$web = $info[1];
-			$file = $info[2];
-			$this->scripts[] = $web.'/'.$file;
-		}
-		$this->assign('scripts',$this->scripts);
-
-		// Add the css files
-		$this->styles[] = OC_Helper::linkToRemote('core.css', false);
-		$cssfiles = OC_TemplateLayout::findStylesheetFiles(OC_Util::$styles);
-
-		foreach($cssfiles as $info) {
-			$root = $info[0];
-			$web = $info[1];
-			$file = $info[2];
-			$paths = explode('/', $file);
-
-			$in_root = false;
-			foreach(OC::$APPSROOTS as $app_root) {
-				if($root == $app_root['path']) {
-					$in_root = true;
-					break;
-				}
-			}
-
-			if($in_root ) {
-				$app = $paths[0];
-				unset($paths[0]);
-				$path = implode('/', $paths);
-				$this->styles[] = OC_Helper::linkTo($app, $path);
-			}
-			else {
-				$this->styles[] = $web.'/'.$file;
-			}
-		}
-		$this->assign('styles', $this->styles);
-
 	}
 
 	/**
@@ -262,6 +204,11 @@ class OC_TALTemplate extends OC_Template {
 		header('X-Frame-Options: Sameorigin');
 		header('X-XSS-Protection: 1; mode=block');
 		header('X-Content-Type-Options: nosniff');
+		// Content Security Policy
+		// If you change the standard policy, please also change it in config.sample.php
+		$policy = OC_Config::getValue('custom_csp_policy',  'default-src \'self\'; script-src \'self\' \'unsafe-eval\'; style-src \'self\' \'unsafe-inline\'; frame-src *; img-src *; font-src \'self\' data:');
+		header('Content-Security-Policy:'.$policy); // Standard
+		header('X-WebKit-CSP:'.$policy); // Older webkit browsers
 		echo $this->fetchPage();
 	}
 
@@ -274,28 +221,19 @@ class OC_TALTemplate extends OC_Template {
 	 */
 	public function fetchPage(){
 		//error_log('renderas: '.$this->renderas);
+		$data = $this->_engine->execute();
 		if($this->renderas) {
 			$page = new OC_TemplateLayout($this->renderas);
 			// Add custom headers
-			$this->assign('headers',array_merge($this->_headers, OC_Util::$headers));
-			// Add navigation entry
-			$navigation = OC_App::getNavigation();
-			$this->assign( "navigation", $navigation);
-			$this->assign( "settingsnavigation", OC_App::getSettingsNavigation());
-			if(array_search(OC_APP::getCurrentApp(),array('settings','admin','help'))!==false){
-				$this->assign('bodyid','body-settings');
-			}else{
-				$this->assign('bodyid','body-user');
+			$page->assign('headers', $this->_headers, false);
+			foreach(OC_Util::$headers as $header) {
+				$page->append('headers', $header);
 			}
-			foreach($navigation as $entry) {
-				if ($entry['active']) {
-					$this->assign( 'application', $entry['name'] );
-					break;
-				}
-			}
+
+			$page->assign( "content", $data, false );
+			return $page->fetchPage();
 		}
-		//error_log('utilheaders'.print_r(array_merge($this->_headers, OC_Util::$headers), true));
-		return $this->_engine->execute();
+		return $data;
 	}
 
 	static function linkTo($src) {
