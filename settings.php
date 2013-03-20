@@ -6,11 +6,11 @@
  * See the COPYING-README file.
  */
 
- 
+
 OCP\JSON::checkLoggedIn();
 OCP\JSON::checkAppEnabled('tal');
 
-$tmpl = new OC_TALTemplate('tal', 'settings');
+$tmpl = new OCA\TAL\Template('tal', 'settings');
 return $tmpl->fetchPage();
 
 ?>
