@@ -39,7 +39,7 @@ class Template extends \OCP\Template {
 			$theme = \OC_Util::getTheme();
 			// Read the detected formfactor and use the right file name.
 			$fext = self::getFormFactorExtension();
-			$this->findTemplate($theme, $app, $name, $fext);
+			$this->getTemplate($theme, $app, $name, $fext);
 		}
 		self::$app = $app;
 		$this->assign('application', self::$app);
@@ -133,7 +133,7 @@ class Template extends \OCP\Template {
 	 * Will select the template file for the selected theme and formfactor.
 	 * Checking all the possible locations.
 	 */
-	protected function findTemplate($theme, $app, $name, $fext) {
+	protected function getTemplate($theme, $app, $name, $fext) {
 		// Check if it is a app template or not.
 		if( $app !== '' ) {
 			$dirs = $this->getAppTemplateDirs($theme, $app, \OC::$SERVERROOT, \OC_App::getAppPath($app));
