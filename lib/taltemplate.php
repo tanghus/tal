@@ -26,10 +26,21 @@ class Template extends \OCP\Template {
 		if(defined('DEBUG') && DEBUG) {
 			ini_set('display_errors', true);
 		}
+
+		list($version,) = \OCP\Util::getVersion();
+
 		$this->renderas = $renderas;
 		$this->i18n = new L10N($app);
 		$this->setEngine(new \PHPTAL());
-		parent::__construct($app, $name, $renderas);
+		if($version < 6) {
+			parent::__construct($app, $name, $renderas);
+		} else {
+			// Read the selected theme from the config file
+			$theme = \OC_Util::getTheme();
+			// Read the detected formfactor and use the right file name.
+			$fext = self::getFormFactorExtension();
+			$this->findTemplate($theme, $app, $name, $fext);
+		}
 		self::$app = $app;
 		$this->assign('application', self::$app);
 		$this->assign('i18n', $this->i18n);
@@ -113,6 +124,46 @@ class Template extends \OCP\Template {
 		} catch (Exception $e) {
 			throw new Exception($e);
 		}
+	}
+
+	/**
+	 * @brief find the template with the given name
+	 * @param string $name of the template file (without suffix)
+	 *
+	 * Will select the template file for the selected theme and formfactor.
+	 * Checking all the possible locations.
+	 */
+	protected function findTemplate($theme, $app, $name, $fext) {
+		// Check if it is a app template or not.
+		if( $app !== '' ) {
+			$dirs = $this->getAppTemplateDirs($theme, $app, \OC::$SERVERROOT, \OC_App::getAppPath($app));
+		} else {
+			$dirs = $this->getCoreTemplateDirs($theme, \OC::$SERVERROOT);
+		}
+
+		foreach($dirs as $dir) {
+			$file = $dir.$name.$fext.'.pt';
+			if (is_file($file)) {
+				$this->path = $dir;
+				$this->template = $file;
+				break;
+			}
+			$file = $dir.$name.'.pt';
+			\OCP\Util::writeLog('tal','Checking file: ' . $file, \OCP\Util::DEBUG);
+			if (is_file($file)) {
+				$this->path = $dir;
+				$this->template = $file;
+				break;
+			}
+		}
+
+		if(!$this->template) {
+			throw new \Exception('template file not found: template:'.$template.' formfactor:'.$fext);
+		}
+
+		$this->_engine->template = $this->template;
+		$this->_engine->setTemplate($this->template);
+
 	}
 
 	/**
