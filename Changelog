@@ -1,5 +1,9 @@
 # Changelog
 
+### 0.2.3
+
+* Update to work both on ownCloud 5 and 6.
+
 ### 0.2.2
 
 * Moved version to info.xml
