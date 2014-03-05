@@ -16,16 +16,13 @@ class Template extends \OCP\Template {
 	/**
 	*/
 	protected $_engine = null;
-	protected $scripts = Array();
-	protected $styles = Array();
-	protected $_headers = Array();
+	protected $scripts = array();
+	protected $styles = array();
+	protected $_headers = array();
 	protected $renderas;
 	protected static $app = '';
 
-	public function __construct($app, $name, $renderas = "") {
-		if(defined('DEBUG') && DEBUG) {
-			ini_set('display_errors', true);
-		}
+	public function __construct($app, $name, $renderas = '') {
 
 		list($version,) = \OCP\Util::getVersion();
 
@@ -67,7 +64,7 @@ class Template extends \OCP\Template {
 	*
 	* @name setEngine
 	* @access public
-	* @param object PHPTAL $engine
+	* @param \PHPTAL $engine
 	*/
 	public function setEngine(\PHPTAL $engine) {
 		$view = new \OC_FilesystemView('/' . \OCP\User::getUser());
@@ -76,7 +73,7 @@ class Template extends \OCP\Template {
 		}
 		$this->_engine = $engine;
 		$this->_engine->setPhpCodeDestination($view->getLocalFile('/phptal/'));
-		$this->_engine->setTemplateRepository($_SERVER['DOCUMENT_ROOT'].\OCP\Util::linkTo(self::$app, 'templates'));
+		$this->_engine->setTemplateRepository($_SERVER['DOCUMENT_ROOT'] . \OCP\Util::linkTo(self::$app, 'templates'));
 		$this->_engine->set('this', $this);
 		$this->_engine->setOutputMode(\PHPTAL::HTML5);
 		$this->_engine->setTranslator($this->i18n);
@@ -98,6 +95,7 @@ class Template extends \OCP\Template {
 	*
 	* @name getEngine
 	* @access public
+	* @return \PHPTAL
 	*/
 	public function getEngine() {
 		return $this->_engine;
@@ -121,17 +119,18 @@ class Template extends \OCP\Template {
 		$this->_engine->setTemplate(func_get_arg(0));
 		try {
 			echo $this->_engine->execute();
-		} catch (Exception $e) {
-			throw new Exception($e);
+		} catch (\Exception $e) {
+			\OCP\Util::writeLog('tal', __METHOD__ . ', Exception: ' . $e->getMessage(), \OCP\Util::DEBUG);
+			throw $e;
 		}
 	}
 
 	/**
-	 * @brief find the template with the given name
-	 * @param string $name of the template file (without suffix)
+	 * Find the template with the given name
 	 *
 	 * Will select the template file for the selected theme and formfactor.
 	 * Checking all the possible locations.
+	 * @param string $name of the template file (without suffix)
 	 */
 	protected function getTemplate($theme, $app, $name, $fext) {
 		// Check if it is a app template or not.
@@ -149,7 +148,7 @@ class Template extends \OCP\Template {
 				break;
 			}
 			$file = $dir.$name.'.pt';
-			\OCP\Util::writeLog('tal','Checking file: ' . $file, \OCP\Util::DEBUG);
+
 			if (is_file($file)) {
 				$this->path = $dir;
 				$this->template = $file;
@@ -158,7 +157,7 @@ class Template extends \OCP\Template {
 		}
 
 		if(!$this->template) {
-			throw new \Exception('template file not found: template:'.$template.' formfactor:'.$fext);
+			throw new \Exception('template file not found: template:' . $template . ' formfactor:' . $fext);
 		}
 
 		$this->_engine->template = $this->template;
@@ -177,14 +176,16 @@ class Template extends \OCP\Template {
 	 * the specified $path
 	 */
 	protected function checkPathForTemplate($path, $name, $fext) {
-		if ($name =='') return false;
+		if ($name =='') {
+			return false;
+		}
 		$template = null;
-		if( is_file( $path.$name.$fext.'.pt' )){
+		if( is_file( $path.$name.$fext.'.pt' )) {
 			$template = $path.$name.$fext.'.pt';
-		}elseif( is_file( $path.$name.'.pt' )){
+		} elseif( is_file( $path.$name.'.pt' )) {
 			$template = $path.$name.'.pt';
 		}
-		//error_log('Template: '.$template);
+
 		if ($template) {
 			$this->template = $template;
 			$this->path = $path;
@@ -207,7 +208,7 @@ class Template extends \OCP\Template {
 	 *
 	 * If the key existed before, it will be overwritten
 	 */
-	public function assign( $key, $value, $sanitizeHTML=false ){
+	public function assign($key, $value, $sanitizeHTML = false) {
 		$this->_engine->set($key, $value);
 		return true;
 	}
@@ -218,17 +219,22 @@ class Template extends \OCP\Template {
 	 * @param array $attributes array of attributes for the element
 	 * @param string $text the text content for the element
 	 */
-	public function addHeader( $tag, $attributes, $text=''){
-		$this->_headers[]=array('tag'=>$tag,'attributes'=>$attributes,'text'=>$text);
+	public function addHeader($tag, $attributes, $text='') {
+		$this->_headers[] = array(
+			'tag' => $tag,
+			'attributes' => $attributes,
+			'text' => $text
+		);
 	}
 
 	/**
-	 * @brief Prints the proceeded template
-	 * @returns true/false
+	 * Prints the proceeded template
 	 *
-	 * This function proceeds the template and prints its output.
+	 * This method proceeds the template and prints its output.
+	 *
+	 * @returns bool
 	 */
-	public function printPage(){
+	public function printPage() {
 		// Some headers to enhance security
 		header('X-Frame-Options: Sameorigin');
 		header('X-XSS-Protection: 1; mode=block');
@@ -248,9 +254,9 @@ class Template extends \OCP\Template {
 	 * This function proceeds the template. If $this->renderas is set, it
 	 * will produce a full page.
 	 */
-	public function fetchPage(){
-		//error_log('renderas: '.$this->renderas);
+	public function fetchPage() {
 		$data = $this->_engine->execute();
+
 		if($this->renderas) {
 			$page = new \OC_TemplateLayout($this->renderas);
 			// Add custom headers
@@ -259,21 +265,20 @@ class Template extends \OCP\Template {
 				$page->append('headers', $header);
 			}
 
-			$page->assign( "content", $data, false );
+			$page->assign('content', $data, false);
 			return $page->fetchPage();
 		}
 		return $data;
 	}
 
 	static function linkTo($src) {
-		//error_log('linkTo '.$src);
 		$parts = is_array($src)?$src:explode('/', rtrim($src));
-		if($parts[0] == '') {
+		if($parts[0] === '') {
 			array_shift($parts);
 			return \OCP\Util::linkTo('', implode('/', $parts));
-		} elseif(count($parts) == 1) {
+		} elseif(count($parts) === 1) {
 			return \OCP\Util::linkTo('', implode('/', $parts));
-		} elseif(trim($parts[0] == 'core')) {
+		} elseif(trim($parts[0]) === 'core') {
 			array_shift($parts);
 			return \OCP\Util::linkTo('', implode('/', $parts));
 		} else { // This should be an app.
@@ -282,14 +287,13 @@ class Template extends \OCP\Template {
 	}
 
 	static function linkToAbsolute($src) {
-		//error_log('linkTo '.$src);
 		$parts = is_array($src)?$src:explode('/', rtrim($src));
-		if($parts[0] == '') {
+		if($parts[0] === '') {
 			array_shift($parts);
 			return \OCP\Util::linkToAbsolute('', implode('/', $parts));
-		} elseif(count($parts) == 1) {
+		} elseif(count($parts) === 1) {
 			return \OCP\Util::linkToAbsolute('', implode('/', $parts));
-		} elseif(trim($parts[0] == 'core')) {
+		} elseif(trim($parts[0]) === 'core') {
 			array_shift($parts);
 			return \OCP\Util::linkToAbsolute('', implode('/', $parts));
 		} else { // This should be an app.
@@ -298,14 +302,13 @@ class Template extends \OCP\Template {
 	}
 
 	static function imagePath($src) {
-		//error_log('imagePath '.$src);
 		$parts = is_array($src)?$src:explode('/', rtrim($src));
-		if($parts[0] == '') {
+		if($parts[0] === '') {
 			array_shift($parts);
 			return \OCP\Util::imagePath('', implode('/', $parts));
-		} elseif(count($parts) == 1) {
+		} elseif(count($parts) === 1) {
 			return \OCP\Util::imagePath('', implode('/', $parts));
-		} elseif(trim($parts[0] == 'core')) {
+		} elseif(trim($parts[0]) === 'core') {
 			array_shift($parts);
 			return \OCP\Util::imagePath('', implode('/', $parts));
 		} else { // This should be an app.
@@ -314,7 +317,7 @@ class Template extends \OCP\Template {
 	}
 
 	static function config($src) {
-		$parts = is_array($src)?$src:explode('/', rtrim($src));
+		$parts = is_array($src) ? $src : explode('/', rtrim($src));
 		if(count($parts) < 2) {
 			throw new \PHPTAL_Exception('Wrong argument count: config: takes no less than 2 arguments.');
 		} else {
@@ -323,20 +326,20 @@ class Template extends \OCP\Template {
 					return \OCP\Config::getSystemValue($parts[1]);
 			        break;
 			    case 'app':
-					if(count($parts) == 2) {
+					if(count($parts) === 2) {
 						return \OCP\Config::getAppValue(self::app, $parts[1]);
-					} elseif(count($parts) == 3) {
+					} elseif(count($parts) === 3) {
 						return \OCP\Config::getAppValue($parts[1], $parts[2]);
 					} else {
 						throw new \PHPTAL_Exception('Wrong argument count: config:$app takes no more than 3 arguments.');
 					}
 			        break;
 			    case 'user':
-					if(count($parts) == 2) {
+					if(count($parts) === 2) {
 						return \OCP\Config::getUserValue(\OCP\User::getUser(), self::app, $parts[1]);
-					} elseif(count($parts) == 3) {
+					} elseif(count($parts) === 3) {
 						return \OCP\Config::getUserValue(\OCP\User::getUser(), $parts[1], $parts[2]);
-					} elseif(count($parts) == 4) {
+					} elseif(count($parts) === 4) {
 						return \OCP\Config::getUserValue($parts[1], $parts[2], $parts[3]);
 					} else {
 						throw new \PHPTAL_Exception('Wrong argument count: config: takes no more than 4 arguments.');
