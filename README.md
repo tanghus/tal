@@ -1,6 +1,8 @@
 # TAL Page Templates for ownCloud
 
-[![Scrutinizer Quality Score](https://scrutinizer-ci.com/g/tanghus/tal/badges/quality-score.png?s=434867c2ea156fc326b5b6a306bfa5e35b844e50)](https://scrutinizer-ci.com/g/tanghus/tal/)
+| Code quality | Latest release |
+|--------------|----------------|
+| [![Scrutinizer Quality Score](https://scrutinizer-ci.com/g/tanghus/tal/badges/quality-score.png?s=126186f91faaf8adcfe463e4fe26e252a3fe4dad)](https://scrutinizer-ci.com/g/tanghus/tal/) | [![Latest release](http://img.shields.io/github/release/tanghus/tal.svg)](https://github.com/tanghus/tal/releases) |
 
 Develop using the Template Attribute Language instead of having clumsy
 `<?php echo $var; ?>` tags in your markup.
