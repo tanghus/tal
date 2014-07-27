@@ -20,7 +20,7 @@ class Template extends \OCP\Template {
 	protected $styles = array();
 	protected $_headers = array();
 	protected $renderas;
-	protected static $app = '';
+	protected $app = '';
 
 	public function __construct($app, $name, $renderas = '') {
 
@@ -38,8 +38,8 @@ class Template extends \OCP\Template {
 			$fext = self::getFormFactorExtension();
 			$this->getTemplate($theme, $app, $name, $fext);
 		}
-		self::$app = $app;
-		$this->assign('application', self::$app);
+		$this->app = $app;
+		$this->assign('application', $this->app);
 		$this->assign('i18n', $this->i18n);
 		$this->assign('user', \OCP\User::getUser());
 		$user_displayname = \OCP\User::getDisplayName();
@@ -67,13 +67,13 @@ class Template extends \OCP\Template {
 	* @param \PHPTAL $engine
 	*/
 	public function setEngine(\PHPTAL $engine) {
-		$view = new \OC_FilesystemView('/' . \OCP\User::getUser());
+		$view = new \OC\Files\View('/' . \OCP\User::getUser());
 		if(!$view->file_exists('phptal')) {
 			$view->mkdir('phptal');
 		}
 		$this->_engine = $engine;
 		$this->_engine->setPhpCodeDestination($view->getLocalFile('/phptal/'));
-		$this->_engine->setTemplateRepository($_SERVER['DOCUMENT_ROOT'] . \OCP\Util::linkTo(self::$app, 'templates'));
+		$this->_engine->setTemplateRepository($_SERVER['DOCUMENT_ROOT'] . \OCP\Util::linkTo($this->app, 'templates'));
 		$this->_engine->set('this', $this);
 		$this->_engine->setOutputMode(\PHPTAL::HTML5);
 		$this->_engine->setTranslator($this->i18n);
