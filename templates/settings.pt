@@ -1,4 +1,4 @@
-<form id="tal">
+<form id="tal" class="section">
 	<fieldset class="personalblock">
 		<legend i18n:translate="">TAL Page Templates for ownCloud</legend>
 		<p i18n:translate="">You can now create templates using TAL. As a matter of fact this section is using the internationalization namespace defined in TAL.<br />
